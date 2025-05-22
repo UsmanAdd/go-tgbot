@@ -1,29 +1,10 @@
-# Сборочный образ
-FROM golang:1.23-alpine AS builder
-
-# Устанавливаем рабочую директорию
+FROM golang:1.20-alpine AS builder
 WORKDIR /app
-
-# Копируем модули
 COPY go.mod go.sum ./
-
-# Загружаем зависимости
 RUN go mod download
-
-# Копируем исходный код
 COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o bot ./cmd
 
-# Проверяем содержимое директории
-RUN ls -l ./cmd
-
-# Собираем проект
-RUN mkdir -p cmd && CGO_ENABLED=0 GOOS=linux go build -o cmd/bot ./cmd
-
-# Финальный образ
 FROM alpine:latest
-
-# Копируем исполняемый файл
-COPY --from=builder /app/cmd/bot /bot
-
-# Запускаем бота
+COPY --from=builder /app/bot /bot
 CMD ["/bot"]
