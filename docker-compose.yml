@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  bot:
+    build: .
+    volumes:
+      - .:/app                # Монтирует текущую папку в /app контейнера
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+    restart: unless-stopped
